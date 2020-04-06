@@ -12,47 +12,7 @@ Surface::Surface(int width, int height)
 
 Surface::Surface(const std::string& fileName)
 {
-	std::ifstream file(fileName, std::ios::binary);
-	assert(file);
-
-	BITMAPFILEHEADER bmFileHeader;
-	file.read(reinterpret_cast<char*>(&bmFileHeader), sizeof(bmFileHeader));
-
-	BITMAPINFOHEADER bmInfoHeader;
-	file.read(reinterpret_cast<char*>(&bmInfoHeader), sizeof(bmInfoHeader));
-
-	assert((bmInfoHeader.biBitCount == 24) || (bmInfoHeader.biBitCount == 32));
-	assert(bmInfoHeader.biCompression == BI_RGB);
-
-	width = bmInfoHeader.biWidth;
-	height = std::abs(bmInfoHeader.biHeight);
-	pPixels = new Color[width * height];
-
-	file.seekg(bmFileHeader.bfOffBits);
-	int numberOfColorsInPixel = bmInfoHeader.biBitCount / 3;
-	auto filePadding = (4 - (width * 3) % 4) % 4;
-
-	int dy = -1;
-	int startY = height - 1;
-	int endY = -1;
-	if (bmInfoHeader.biHeight < 0) {
-		dy = 1;
-		startY = 0;
-		endY = bmInfoHeader.biHeight;
-	}
-
-	for (int y = startY; y != endY; y = y + dy) {
-		for (int x = 0; x < width; x++) {
-			PutPixel(x, y, Color(file.get(), file.get(), file.get()));
-
-			if (bmInfoHeader.biBitCount == 32) {
-				file.seekg(1, std::ios::cur);
-			}
-		}
-		if (bmInfoHeader.biBitCount != 32) {
-			file.seekg(filePadding, std::ios::cur);
-		}
-	}
+	ReadSurfaceFile(fileName);
 }
 
 Surface::Surface(const Surface& surface)
@@ -120,5 +80,51 @@ int Surface::GetHeight() const
 
 RectI Surface::GetRect() const
 {
-	return RectI({0,0}, width, height);
+	return RectI({ 0,0 }, width, height);
+}
+
+void Surface::ReadSurfaceFile(const std::string& fileName)
+{
+	std::ifstream file(fileName, std::ios::binary);
+	assert(file);
+
+	BITMAPFILEHEADER bmFileHeader;
+	file.read(reinterpret_cast<char*>(&bmFileHeader), sizeof(bmFileHeader));
+
+	BITMAPINFOHEADER bmInfoHeader;
+	file.read(reinterpret_cast<char*>(&bmInfoHeader), sizeof(bmInfoHeader));
+
+	assert((bmInfoHeader.biBitCount == 24) || (bmInfoHeader.biBitCount == 32));
+	assert(bmInfoHeader.biCompression == BI_RGB);
+
+	width = bmInfoHeader.biWidth;
+	height = std::abs(bmInfoHeader.biHeight);
+	pPixels = new Color[width * height];
+
+	file.seekg(bmFileHeader.bfOffBits);
+	int numberOfColorsInPixel = bmInfoHeader.biBitCount / 3;
+	auto filePadding = (4 - (width * 3) % 4) % 4;
+
+	int dy = -1;
+	int startY = height - 1;
+	int endY = -1;
+	if (bmInfoHeader.biHeight < 0) {
+		dy = 1;
+		startY = 0;
+		endY = bmInfoHeader.biHeight;
+	}
+
+	for (int y = startY; y != endY; y = y + dy) {
+		for (int x = 0; x < width; x++) {
+			auto color = Color(file.get(), file.get(), file.get());
+			PutPixel(x, y, color);
+
+			if (bmInfoHeader.biBitCount == 32) {
+				file.seekg(1, std::ios::cur);
+			}
+		}
+		if (bmInfoHeader.biBitCount != 32) {
+			file.seekg(filePadding, std::ios::cur);
+		}
+	}
 }

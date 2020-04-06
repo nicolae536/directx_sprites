@@ -26,6 +26,8 @@
 #include "Surface.h"
 #include "Character.h"
 #include "FrameTimer.h"
+#include "Font.h"
+#include "Sound.h"
 
 class Game
 {
@@ -46,6 +48,9 @@ private:
 	/********************************/
 	/*  User Variables              */
     FrameTimer frameTimer;
-    Character linq;
+    Character link;
+    Font consolas;
+    Font fixedSys;
+    Sound hit = L"Sounds\\hit.wav";
 	/********************************/
 };

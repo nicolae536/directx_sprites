@@ -20,12 +20,15 @@
  ******************************************************************************************/
 #include "MainWindow.h"
 #include "Game.h"
+#include "ResourceLocator.h"
 
 Game::Game(MainWindow& wnd)
 	:
 	wnd(wnd),
 	gfx(wnd),
-	linq({ 100, 100 }, {0, 0}, 90, 90, 1.5f, "link90x90.bmp")
+	link({ 100, 100 }, {0, 0}, 90, 90, 1.5f, GetResource("link90x90.bmp")),
+	consolas(GetResource("Consolas13x24.bmp"), 3, 32),
+	fixedSys(GetResource("Fixedsys16x28.bmp"), 3, 32)
 {
 }
 
@@ -40,24 +43,30 @@ void Game::Go()
 void Game::UpdateModel()
 {
 	if (wnd.kbd.KeyIsPressed(VK_UP)) {
-		linq.SetDirection({ 0, -1 });
+		link.SetDirection({ 0, -1 });
 	}
 	else if (wnd.kbd.KeyIsPressed(VK_DOWN)) {
-		linq.SetDirection({ 0, 1 });
+		link.SetDirection({ 0, 1 });
 	}
 	else if (wnd.kbd.KeyIsPressed(VK_LEFT)) {
-		linq.SetDirection({ -1, 0 });
+		link.SetDirection({ -1, 0 });
 	}
 	else if (wnd.kbd.KeyIsPressed(VK_RIGHT)) {
-		linq.SetDirection({ 1, 0 });
+		link.SetDirection({ 1, 0 });
 	}
 	else {
-		linq.SetDirection({ 0, 0 });
+		link.SetDirection({ 0, 0 });
 	}
-	linq.Update( frameTimer.Mark() );
+	if (wnd.kbd.KeyIsPressed(VK_SPACE)) {
+		link.ActivateDamadgeEffect();
+		hit.Play();
+	}
+	link.Update( frameTimer.Mark() );
 }
 
 void Game::ComposeFrame()
 {
-	linq.Draw(gfx);
+	consolas.DrawText({ 200, 200 }, "Dushbag \nHello!", gfx);
+	fixedSys.DrawText({ 400, 400 }, "Hello asdas adsas asd \nasas aasdas asdsa!", gfx);
+	link.Draw(gfx);
 }

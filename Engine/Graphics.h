@@ -25,7 +25,7 @@
 #include "ChiliException.h"
 #include "Colors.h"
 #include "Surface.h"
-#include "RectI.h"
+#include "RectangleBox.h"
 
 class Graphics
 {
@@ -54,6 +54,7 @@ public:
 	Graphics& operator=( const Graphics& ) = delete;
 	void EndFrame();
 	void BeginFrame();
+	Color GetPixel(int x, int y) const;
 	void PutPixel( int x,int y,int r,int g,int b )
 	{
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
@@ -61,9 +62,16 @@ public:
 	void PutPixel( int x,int y,Color c );
 	void DrawSprite(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma);
 	void DrawSprite(int x, int y, RectI rect, const Surface& s, const Color& chroma);
+	void DrawSprite(int x, int y, const Surface& s, const Color& chroma);
 	void DrawSpriteNonChroma(int x, int y, const Surface& s);
 	void DrawSpriteNonChroma(int x, int y, const RectI& rect, const Surface& s);
 	void DrawSpriteNonChroma(int x, int y, RectI rect, const RectI& clipRect, const Surface& s);
+	void DrawSpriteSubstitute(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma, const Color& substitute);
+	void DrawSpriteSubstitute(int x, int y, RectI rect, const Surface& s, const Color& chroma, const Color& substitute);
+	void DrawSpriteSubstitute(int x, int y, const Surface& s, const Color& chroma, const Color& substitute);
+	void DrawSpriteGhost(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma);
+	void DrawSpriteGhost(int x, int y, RectI rect, const Surface& s, const Color& chroma);
+	void DrawSpriteGhost(int x, int y, const Surface& s, const Color& chroma);
 
 	RectI GetScreenRect();
 	~Graphics();

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "Colors.h"
-#include "RectI.h"
+#include "RectangleBox.h"
 
 class Surface
 {
@@ -19,6 +19,8 @@ public:
 	int GetHeight() const;
 
 	RectI GetRect() const;
+private:
+	void ReadSurfaceFile(const std::string& fileName);
 private:
 	Color* pPixels = nullptr;
 	int width;

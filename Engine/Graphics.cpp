@@ -322,6 +322,15 @@ void Graphics::PutPixel(int x, int y, Color c)
 	pSysBuffer[Graphics::ScreenWidth * y + x] = c;
 }
 
+Color Graphics::GetPixel(int x, int y) const
+{
+	assert(x >= 0);
+	assert(x < int(Graphics::ScreenWidth));
+	assert(y >= 0);
+	assert(y < int(Graphics::ScreenHeight));
+	return pSysBuffer[Graphics::ScreenWidth * y + x];
+}
+
 void Graphics::DrawSprite(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma)
 {
 	if (x < clipRect.left) {
@@ -355,6 +364,11 @@ void Graphics::DrawSprite(int x, int y, RectI rect, const RectI& clipRect, const
 void Graphics::DrawSprite(int x, int y, RectI rect, const Surface& s, const Color& chroma)
 {
 	DrawSprite(x, y, rect, GetScreenRect(), s, chroma);
+}
+
+void Graphics::DrawSprite(int x, int y, const Surface& s, const Color& chroma)
+{
+	DrawSprite(x, y, s.GetRect(), GetScreenRect(), s, chroma);
 }
 
 void Graphics::DrawSpriteNonChroma(int x1, int y1, const Surface& s)
@@ -397,6 +411,93 @@ void Graphics::DrawSpriteNonChroma(int x, int y, RectI rect, const RectI& clipRe
 	}
 }
 
+void Graphics::DrawSpriteSubstitute(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma, const Color& substitute)
+{
+	if (x < clipRect.left) {
+		rect.left += clipRect.left - x;
+		x = clipRect.left;
+	}
+	if (y < clipRect.top) {
+		rect.top += clipRect.top - y;
+		y = clipRect.top;
+	}
+
+	auto rightSide = x + rect.GetWidth();
+	if (rightSide > clipRect.right) {
+		rect.right -= rightSide - clipRect.right;
+	}
+	auto bottomSide = y + rect.GetHeight();
+	if (bottomSide > clipRect.bottom) {
+		rect.bottom -= bottomSide - clipRect.bottom;
+	}
+
+	for (int sy = rect.top; sy < rect.bottom; sy++) {
+		for (int sx = rect.left; sx < rect.right; sx++) {
+			auto pixel = s.GetPixel(sx, sy);
+			if (pixel != chroma) {
+				PutPixel(x + sx - rect.left, y + sy - rect.top, substitute);
+			}
+		}
+	}
+}
+
+void Graphics::DrawSpriteSubstitute(int x, int y, RectI rect, const Surface& s, const Color& chroma, const Color& substitute)
+{
+	DrawSpriteSubstitute(x, y, rect, GetScreenRect(), s, chroma, substitute);
+}
+
+void Graphics::DrawSpriteSubstitute(int x, int y, const Surface& s, const Color& chroma, const Color& substitute)
+{
+	DrawSpriteSubstitute(x, y, s.GetRect(), GetScreenRect(), s, chroma, substitute);
+}
+
+void Graphics::DrawSpriteGhost(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma)
+{
+	if (x < clipRect.left) {
+		rect.left += clipRect.left - x;
+		x = clipRect.left;
+	}
+	if (y < clipRect.top) {
+		rect.top += clipRect.top - y;
+		y = clipRect.top;
+	}
+
+	auto rightSide = x + rect.GetWidth();
+	if (rightSide > clipRect.right) {
+		rect.right -= rightSide - clipRect.right;
+	}
+	auto bottomSide = y + rect.GetHeight();
+	if (bottomSide > clipRect.bottom) {
+		rect.bottom -= bottomSide - clipRect.bottom;
+	}
+
+	for (int sy = rect.top; sy < rect.bottom; sy++) {
+		for (int sx = rect.left; sx < rect.right; sx++) {
+			auto pixel = s.GetPixel(sx, sy);
+			if (pixel != chroma) {
+				const int xDest = x + sx - rect.left;
+				const int yDest = y + sy - rect.top;
+				auto screenPixel = GetPixel(xDest, yDest);
+				Color pixelBled = {
+					unsigned char((screenPixel.GetR() + pixel.GetR()) / 2),
+					unsigned char((screenPixel.GetG() + pixel.GetG()) / 2),
+					unsigned char((screenPixel.GetB() + pixel.GetB()) / 2)
+				};
+				PutPixel(xDest, yDest, pixelBled);
+			}
+		}
+	}
+}
+
+void Graphics::DrawSpriteGhost(int x, int y, RectI rect, const Surface& s, const Color& chroma)
+{
+	DrawSpriteGhost(x, y, rect, GetScreenRect(), s, chroma);
+}
+
+void Graphics::DrawSpriteGhost(int x, int y, const Surface& s, const Color& chroma)
+{
+	DrawSpriteGhost(x, y, s.GetRect(), GetScreenRect(), s, chroma);
+}
 
 //////////////////////////////////////////////////
 //           Graphics Exception

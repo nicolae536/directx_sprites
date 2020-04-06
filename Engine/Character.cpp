@@ -1,7 +1,7 @@
 #include "Character.h"
 
 Character::Character(Vector2d<float> position, Vector2d<float> velocity,
-	float width, float height,
+	int width, int height,
 	float sppedFactor, std::string spriteFile)
 	: position(position),
 	direction(velocity),
@@ -61,9 +61,28 @@ void Character::Update(float deltaTime)
 {
 	position += direction * sppedFactor;
 	animations[currentAnimation].Update(deltaTime);
+
+	if (showDamageEffect) {
+		damageEffectTime += deltaTime;
+		if (damageEffectTime > damageEffectDuration) {
+			showDamageEffect = false;
+		}
+	}
+}
+
+void Character::ActivateDamadgeEffect()
+{
+	showDamageEffect = true;
+	damageEffectTime = 0;
 }
 
 void Character::Draw(Graphics& gfx)
 {
-	animations[currentAnimation].Draw((Vector2d<int>)position, gfx);
+	if (showDamageEffect) {
+		animations[currentAnimation].Draw(Vector2d<int>(position), gfx, Colors::Red);
+	}
+	else {
+		animations[currentAnimation].Draw(Vector2d<int>(position), gfx);
+	}
+	
 }

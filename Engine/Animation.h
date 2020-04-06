@@ -3,7 +3,7 @@
 #include <vector>
 #include "Graphics.h"
 #include "Vector2d.h"
-#include "RectI.h"
+#include "RectangleBox.h"
 #include "Colors.h"
 
 class Animation
@@ -13,6 +13,8 @@ public:
 		const Surface& sprite, float holdTime, Color chroma);
 	void Draw(const Vector2d<int>& position, Graphics& gfx) const;
 	void Draw(const Vector2d<int>& position, Graphics& gfx, RectI& clip) const;
+	void Draw(const Vector2d<int>& position, Graphics& gfx, Color color) const;
+	void Draw(const Vector2d<int>& position, Graphics& gfx, RectI& clip, Color charColor) const;
 	void Update(float deltaTime);
 private:
 	void Advance();
