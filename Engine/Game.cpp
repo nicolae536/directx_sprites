@@ -66,7 +66,9 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
+	benchmark.Start();
 	consolas.DrawText({ 200, 200 }, "Dushbag \nHello!", gfx);
 	fixedSys.DrawText({ 400, 400 }, "Hello asdas adsas asd \nasas aasdas asdsa!", gfx);
 	link.Draw(gfx);
+	benchmark.End();
 }

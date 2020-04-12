@@ -26,6 +26,7 @@
 #include "Colors.h"
 #include "Surface.h"
 #include "RectangleBox.h"
+#include <cassert>
 
 class Graphics
 {
@@ -60,18 +61,48 @@ public:
 		PutPixel( x,y,{ unsigned char( r ),unsigned char( g ),unsigned char( b ) } );
 	}
 	void PutPixel( int x,int y,Color c );
-	void DrawSprite(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma);
-	void DrawSprite(int x, int y, RectI rect, const Surface& s, const Color& chroma);
-	void DrawSprite(int x, int y, const Surface& s, const Color& chroma);
-	void DrawSpriteNonChroma(int x, int y, const Surface& s);
-	void DrawSpriteNonChroma(int x, int y, const RectI& rect, const Surface& s);
-	void DrawSpriteNonChroma(int x, int y, RectI rect, const RectI& clipRect, const Surface& s);
-	void DrawSpriteSubstitute(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma, const Color& substitute);
-	void DrawSpriteSubstitute(int x, int y, RectI rect, const Surface& s, const Color& chroma, const Color& substitute);
-	void DrawSpriteSubstitute(int x, int y, const Surface& s, const Color& chroma, const Color& substitute);
-	void DrawSpriteGhost(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, const Color& chroma);
-	void DrawSpriteGhost(int x, int y, RectI rect, const Surface& s, const Color& chroma);
-	void DrawSpriteGhost(int x, int y, const Surface& s, const Color& chroma);
+
+	template<typename E>
+	void DrawSprite(int x, int y, RectI rect, const Surface& s, E effect)
+	{
+		DrawSprite(x, y, rect, GetScreenRect(), s, effect);
+	}
+
+	template<typename E>
+	void DrawSprite(int x, int y, const Surface& s, E effect)
+	{
+		DrawSprite(x, y, s.GetRect(), GetScreenRect(), s, effect);
+	}
+
+	template<typename E>
+	void DrawSprite(int x, int y, RectI rect, const RectI& clipRect, const Surface& s, E effect)
+	{
+		if (x < clipRect.left) {
+			rect.left += clipRect.left - x;
+			x = clipRect.left;
+		}
+		if (y < clipRect.top) {
+			rect.top += clipRect.top - y;
+			y = clipRect.top;
+		}
+
+		auto rightSide = x + rect.GetWidth();
+		if (rightSide > clipRect.right) {
+			rect.right -= rightSide - clipRect.right;
+		}
+		auto bottomSide = y + rect.GetHeight();
+		if (bottomSide > clipRect.bottom) {
+			rect.bottom -= bottomSide - clipRect.bottom;
+		}
+
+		for (int sy = rect.top; sy < rect.bottom; sy++) {
+			for (int sx = rect.left; sx < rect.right; sx++) {
+				auto pixel = s.GetPixel(sx, sy);
+				effect(pixel, x + sx - rect.left, y + sy - rect.top, *this);
+			}
+		}
+	}
+
 
 	RectI GetScreenRect();
 	~Graphics();

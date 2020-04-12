@@ -1,6 +1,7 @@
 #include "Font.h"
 #include <cassert>
 #include "ChiliException.h"
+#include "SpriteEffect.h"
 
 Font::Font(std::string fileName, int rows, int columns)
 	:fontSurface(fileName),
@@ -34,7 +35,7 @@ void Font::DrawText(Vector2d<int> position, std::string text, Graphics& gfx)
 		}
 		else {
 			auto textRect = MapChartToLetter(it);
-			gfx.DrawSpriteSubstitute(cursor.x, cursor.y, textRect, fontSurface, chroma, fontColor);
+			gfx.DrawSprite(cursor.x, cursor.y, textRect, fontSurface, SpriteEffect::Substitution(chroma, fontColor));
 			cursor.x += letterWidth;
 		}
 	}

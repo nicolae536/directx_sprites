@@ -7,7 +7,7 @@ Surface::Surface(int width, int height)
 	:width(width),
 	height(height)
 {
-	pPixels = new Color[width * height];
+	pPixels = std::make_unique<Color[]>(width * height);
 }
 
 Surface::Surface(const std::string& fileName)
@@ -15,10 +15,10 @@ Surface::Surface(const std::string& fileName)
 	ReadSurfaceFile(fileName);
 }
 
-Surface::Surface(const Surface& surface)
+Surface::Surface(Surface& surface)
 	:Surface(surface.width, surface.height)
 {
-	pPixels = new Color[width * height];
+	pPixels = std::make_unique<Color[]>(width * height);
 	for (int i = 0; i < width * height; i++) {
 		pPixels[i] = surface.pPixels[i];
 	}
@@ -28,21 +28,12 @@ Surface& Surface::operator=(const Surface& other)
 {
 	width = other.width;
 	height = other.height;
-
-	delete[] pPixels;
-
-	pPixels = new Color[width * height];
+	pPixels = std::make_unique<Color[]>(width * height);
 	for (int i = 0; i < width * height; i++) {
 		pPixels[i] = other.pPixels[i];
 	}
 
 	return *this;
-}
-
-Surface::~Surface()
-{
-	delete[] pPixels;
-	pPixels = nullptr;
 }
 
 void Surface::PutPixel(int x, int y, Color c)
@@ -99,7 +90,7 @@ void Surface::ReadSurfaceFile(const std::string& fileName)
 
 	width = bmInfoHeader.biWidth;
 	height = std::abs(bmInfoHeader.biHeight);
-	pPixels = new Color[width * height];
+	pPixels = std::make_unique<Color[]>(width * height);
 
 	file.seekg(bmFileHeader.bfOffBits);
 	int numberOfColorsInPixel = bmInfoHeader.biBitCount / 3;

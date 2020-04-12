@@ -13,22 +13,23 @@ Animation::Animation(int x, int y, int width, int height, int count,
 
 void Animation::Draw(const Vector2d<int>& position, Graphics& gfx) const
 {
-	gfx.DrawSpriteGhost(position.x, position.y, frames[currentFrame], gfx.GetScreenRect(), sprite, chroma);
+
+	gfx.DrawSprite(position.x, position.y, frames[currentFrame], gfx.GetScreenRect(), sprite, SpriteEffect::Ghost(chroma));
 }
 
 void Animation::Draw(const Vector2d<int>& position, Graphics& gfx, RectI& clip) const
 {
-	gfx.DrawSpriteGhost(position.x, position.y, frames[currentFrame], clip, sprite, chroma);
+	gfx.DrawSprite(position.x, position.y, frames[currentFrame], clip, sprite, SpriteEffect::Copy());
 }
 
 void Animation::Draw(const Vector2d<int>& position, Graphics& gfx, RectI& clip, Color color) const
 {
-	gfx.DrawSpriteSubstitute(position.x, position.y, frames[currentFrame], clip, sprite, chroma, color);
+	gfx.DrawSprite(position.x, position.y, frames[currentFrame], clip, sprite, SpriteEffect::Substitution(chroma, color));
 }
 
 void Animation::Draw(const Vector2d<int>& position, Graphics& gfx, Color color) const
 {
-	gfx.DrawSpriteSubstitute(position.x, position.y, frames[currentFrame], sprite, chroma, color);
+	gfx.DrawSprite(position.x, position.y, frames[currentFrame], sprite, SpriteEffect::Substitution(chroma, color));
 }
 
 void Animation::Update(float deltaTime)

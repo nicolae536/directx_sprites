@@ -5,6 +5,7 @@
 #include "Vector2d.h"
 #include "RectangleBox.h"
 #include "Colors.h"
+#include "SpriteEffect.h"
 
 class Animation
 {

@@ -28,6 +28,7 @@
 #include "FrameTimer.h"
 #include "Font.h"
 #include "Sound.h"
+#include "Benchmark.h"
 
 class Game
 {
@@ -52,5 +53,6 @@ private:
     Font consolas;
     Font fixedSys;
     Sound hit = L"Sounds\\hit.wav";
+    Benchmark benchmark;
 	/********************************/
 };
