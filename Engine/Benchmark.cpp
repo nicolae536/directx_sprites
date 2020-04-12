@@ -9,7 +9,7 @@ void Benchmark::Start()
 
 void Benchmark::End()
 {
-	auto deltaTime = std::chrono::steady_clock::now() - last;
+	std::chrono::duration<float> deltaTime = std::chrono::steady_clock::now() - last;
 	if (deltaTime.count() < minTime) {
 		minTime = deltaTime.count();
 	}
@@ -17,6 +17,8 @@ void Benchmark::End()
 	if (deltaTime.count() > maxTime) {
 		maxTime = deltaTime.count();
 	}
+
+	sampler++;
 }
 
 Benchmark::~Benchmark()
@@ -24,9 +26,9 @@ Benchmark::~Benchmark()
 	std::ofstream out("Benchmark.txt", std::ios_base::app);
 
 	LogBenchmarkMarker(out);
-	out << "Min time: " << std::setprecision(5) << minTime * std::pow(10, -6) << " ms\n";
-	out << "Max time: " << std::setprecision(5) << maxTime * std::pow(10, -6) << " ms\n";
-	LogBenchmarkMarker(out);
+	out << "Samples count: " << sampler << " ms\n";
+	out << "Min time: " << std::setprecision(5) << minTime * 1000.0f << " ms\n";
+	out << "Max time: " << std::setprecision(5) << maxTime * 1000.0f << " ms\n";
 	out.flush();
 	out.close();
 }

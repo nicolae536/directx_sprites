@@ -1,13 +1,16 @@
 #include "Surface.h"
-#include <cassert>
 #include <fstream>
 #include "ChiliWin.h"
+
+#define SURFACE_EXCEPTIONS( note ) Surface::Exception( _CRT_WIDE(__FILE__),__LINE__,note )
+
 
 Surface::Surface(int width, int height)
 	:width(width),
 	height(height)
 {
-	pPixels = std::make_unique<Color[]>(width * height);
+	auto totalSize = width * height;
+	pPixels.resize(totalSize);
 }
 
 Surface::Surface(const std::string& fileName)
@@ -15,48 +18,20 @@ Surface::Surface(const std::string& fileName)
 	ReadSurfaceFile(fileName);
 }
 
-Surface::Surface(Surface& surface)
-	:Surface(surface.width, surface.height)
+Surface::Surface(Surface&& rhs) noexcept
 {
-	pPixels = std::make_unique<Color[]>(width * height);
-	for (int i = 0; i < width * height; i++) {
-		pPixels[i] = surface.pPixels[i];
-	}
+	*this = std::move(rhs);
 }
 
-Surface& Surface::operator=(const Surface& other)
+Surface& Surface::operator=(Surface&& rhs) noexcept
 {
-	width = other.width;
-	height = other.height;
-	pPixels = std::make_unique<Color[]>(width * height);
-	for (int i = 0; i < width * height; i++) {
-		pPixels[i] = other.pPixels[i];
-	}
-
+	width = rhs.width;
+	height = rhs.height;
+	pPixels = std::move(rhs.pPixels);
+	rhs.width = 0;
+	rhs.height = 0;
 	return *this;
-}
-
-void Surface::PutPixel(int x, int y, Color c)
-{
-	assert(x >= 0);
-	assert(x < width);
-	assert(y >= 0);
-	assert(y < height);
-
-
-	auto pixelIndex = width * y + x;
-	pPixels[pixelIndex] = c;
-}
-
-Color Surface::GetPixel(int x, int y) const
-{
-	assert(x >= 0);
-	assert(x < width);
-	assert(y >= 0);
-	assert(y < height);
-
-	auto pixelIndex = width * y + x;
-	return pPixels[pixelIndex];
+	// TODO: insert return statement here
 }
 
 int Surface::GetWidth() const
@@ -77,7 +52,10 @@ RectI Surface::GetRect() const
 void Surface::ReadSurfaceFile(const std::string& fileName)
 {
 	std::ifstream file(fileName, std::ios::binary);
-	assert(file);
+
+	if (!file) {
+		throw SURFACE_EXCEPTIONS(L"Failed to open file");
+	}
 
 	BITMAPFILEHEADER bmFileHeader;
 	file.read(reinterpret_cast<char*>(&bmFileHeader), sizeof(bmFileHeader));
@@ -85,12 +63,17 @@ void Surface::ReadSurfaceFile(const std::string& fileName)
 	BITMAPINFOHEADER bmInfoHeader;
 	file.read(reinterpret_cast<char*>(&bmInfoHeader), sizeof(bmInfoHeader));
 
-	assert((bmInfoHeader.biBitCount == 24) || (bmInfoHeader.biBitCount == 32));
-	assert(bmInfoHeader.biCompression == BI_RGB);
+	if ((bmInfoHeader.biBitCount != 24) && (bmInfoHeader.biBitCount != 32)) {
+		throw SURFACE_EXCEPTIONS(L"Invalid bitmap encodeing should be 24/32 bits");
+	}
+	if (bmInfoHeader.biCompression != BI_RGB) {
+		throw SURFACE_EXCEPTIONS(L"Invalid bitmap compression should be: " + BI_RGB);
+	}
 
 	width = bmInfoHeader.biWidth;
 	height = std::abs(bmInfoHeader.biHeight);
-	pPixels = std::make_unique<Color[]>(width * height);
+	auto totalSize = width * height;
+	pPixels.resize(totalSize);
 
 	file.seekg(bmFileHeader.bfOffBits);
 	int numberOfColorsInPixel = bmInfoHeader.biBitCount / 3;

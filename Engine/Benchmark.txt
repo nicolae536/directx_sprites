@@ -1,0 +1,52 @@
+
+<===== Benchmark Debug =====>
+Min time: 7.342 ms
+Max time: 13.525 ms
+
+<===== Benchmark Debug =====>
+
+<===== Benchmark Release =====>
+Min time: 0.0696 ms
+Max time: 0.2162 ms
+
+<===== Benchmark Release =====>
+
+<===== Benchmark Release =====>
+Min time: 0.1435 ms
+Max time: 5.0213 ms
+
+<===== Benchmark Release =====>
+
+<===== Benchmark Debug =====>
+Min time: 4.9848 ms
+Max time: 8.8374 ms
+
+<===== Benchmark Debug =====>
+
+<===== Benchmark Debug =====>
+Min time: 4.196e-10 ms
+Max time: 4.6114e-09 ms
+
+<===== Benchmark Debug =====>
+
+<===== Benchmark Debug =====>
+Min time: 0 ms
+Max time: 4e-06 ms
+
+<===== Benchmark Debug =====>
+
+<===== Benchmark Debug =====>
+Min time: 0.4189 ms
+Max time: 4.0968 ms
+
+<===== Benchmark Debug =====>
+
+<===== Benchmark Debug =====>
+Samples count: 1733 ms
+Min time: 0.4138 ms
+Max time: 3.6253 ms
+
+<===== Benchmark Debug =====>
+Samples count: 446 ms
+Min time: 0.3712 ms
+Max time: 4.1826 ms
